@@ -1,0 +1,312 @@
+const fs = require('fs');
+
+const meanings = [
+  // Major Arcana
+  {
+    "id": 0,
+    "name": "Der Narr",
+    "upright": "Ein Neuanfang, spontane Entscheidungen und grenzenloses Vertrauen in das Universum. Der Narr ruft dazu auf, Risiken einzugehen und dem eigenen Herzen unbeschwert zu folgen.",
+    "reversed": "Leichtsinn, Naivität und mangelnde Vorsicht. Es droht eine unüberlegte Handlung ohne Rücksicht auf Konsequenzen.",
+    "symbolism": "Der Abgrund steht für das Unbekannte, der weiße Hund warnt vor Gefahren, und die kleine Blume symbolisiert absolute Unschuld und Reinheit in der Absicht."
+  },
+  {
+    "id": 1,
+    "name": "Der Magier",
+    "upright": "Manifestation, Fokus und Willenskraft. Du hast alle Werkzeuge parat, um deine Visionen in die Realität umzusetzen.",
+    "reversed": "Manipulation, ungenutztes Potenzial oder trügerische Absichten. Die Energie verpufft, weil der Fokus fehlt.",
+    "symbolism": "Der Zauberstab lenkt kosmische Energie nach unten. Die vier Symbole vor ihm (Stab, Kelch, Schwert, Münze) repräsentieren die vier Elemente, die seinem Willen unterliegen."
+  },
+  {
+    "id": 2,
+    "name": "Die Hohepriesterin",
+    "upright": "Tiefe innere Intuition, Verborgenes Wissen und das Unterbewusstsein. Sie fordert auf, auf die innere Stimme zu hören statt auf logische Argumente.",
+    "reversed": "Unterdrückte Gefühle, ignorierte Intuition oder oberflächliches Handeln, das von den wahren Bedürfnissen ablenkt.",
+    "symbolism": "Die Säulen (Boaz und Jachin) stehen für Dualität (Licht und Schatten). Die Tora-Rolle symbolisiert göttliche Geheimnisse, und der Schleier verbirgt das ewige Mysterium."
+  },
+  {
+    "id": 3,
+    "name": "Die Herrscherin",
+    "upright": "Fruchtbarkeit, Mütterlichkeit und Fülle der Natur. Es ist die Zeit kreativen Wachstums, der Sinnlichkeit und des Genusses auf allen Ebenen.",
+    "reversed": "Kreative Blockaden, Überfürsorglichkeit oder mangelnde Selbstfürsorge. Man klammert sich zu sehr an materielle oder emotionale Abhängigkeiten.",
+    "symbolism": "Das Weizenfeld steht für reiche Ernte, die Sternenkrone für ihre kosmische Anbindung (12 Tierkreiszeichen) und das Herz-Schild für tiefe, bedingungslose Liebe."
+  },
+  {
+    "id": 4,
+    "name": "Der Herrscher",
+    "upright": "Struktur, Ordnung und Autorität. Rationalität und Disziplin führen zum Erfolg. Es geht um den Aufbau eines stabilen Fundaments.",
+    "reversed": "Dominanz, Herrschsucht, Rigidität oder Chaos durch fehlende Struktur. Ein Machtmissbrauch liegt im Raum.",
+    "symbolism": "Der karge Felsenthron zeigt Härte und Unnachgiebigkeit. Der Widderkopf steht für Kampfgeist und Durchsetzungskraft (Mars/Aries)."
+  },
+  {
+    "id": 5,
+    "name": "Der Hierophant",
+    "upright": "Glaube, Tradition, Lehre und moralische Werte. Ein weiser Ratgeber oder spiritueller Mentor zeigt sich. Die Suche nach tieferem Sinn innerhalb der Gemeinschaft.",
+    "reversed": "Rebellion gegen starre Strukturen, dogmatisches Denken oder das Infragestellen von gesellschaftlichen Normen.",
+    "symbolism": "Die gekreuzten Schlüssel stehen für den Zugang zum bewussten und unbewussten Wissen. Die segnende Handgeste leitet göttliche Energie weiter."
+  },
+  {
+    "id": 6,
+    "name": "Die Liebenden",
+    "upright": "Tiefgreifende Liebe, Harmonie und wichtige Herzensentscheidungen. Es geht um Vereinigung von Gegensätzen und wahre Verbindlichkeit.",
+    "reversed": "Innere Zerrissenheit, Unausgewogenheit in einer Beziehung oder eine Fehlentscheidung aus Angst vor Konsequenzen.",
+    "symbolism": "Der Engel Raphael repräsentiert göttliche Führung. Der Baum der Erkenntnis und der Baum des Lebens verbildlichen den Reifeprozess durch getroffene Entscheidungen."
+  },
+  {
+    "id": 7,
+    "name": "Der Wagen",
+    "upright": "Triumph durch Willenskraft, Kontrolle über Emotionen und zielgerichtetes Voranschreiten. Ein Durchbruch, der Disziplin erfordert.",
+    "reversed": "Kontrollverlust, mangelnde Richtung, oder egoistisches Vorgehen, das in Hindernissen endet.",
+    "symbolism": "Die weiße und die schwarze Sphinx repräsentieren widersprüchliche Triebe, die durch reine Willenskraft (ohne Zügel!) auf ein gemeinsames Ziel ausgerichtet werden."
+  },
+  {
+    "id": 8,
+    "name": "Die Kraft",
+    "upright": "Innere Stärke, Geduld, Mut und Mitgefühl. Triebe werden nicht durch Gewalt, sondern durch Sanftmut bezwungen.",
+    "reversed": "Zweifel, Unsicherheit, Kontrollverlust oder die Verdrängung der eigenen tierischen Instinkte.",
+    "symbolism": "Das Unendlichkeitssymbol verweist auf spirituelle Erleuchtung. Die Frau zähmt den wilden Löwen behutsam – ein Sinnbild für die Kontrolle der niederen Leidenschaften durch Bewusstsein."
+  },
+  {
+    "id": 9,
+    "name": "Der Eremit",
+    "upright": "Rückzug, Introspektion und spirituelle Weisheit. Man sucht Antworten in der eigenen Tiefe statt in der Außenwelt.",
+    "reversed": "Einsamkeit, Isolation oder die Weigerung, sich den eigenen Problemen (oder der Außenwelt) zu stellen.",
+    "symbolism": "Die Laterne birgt den Stern Davids (Wissen/Licht in der Dunkelheit). Der Eisgipfel steht für spirituelle Höhen und Askese."
+  },
+  {
+    "id": 10,
+    "name": "Das Rad des Schicksals",
+    "upright": "Schicksalshafte Wendungen, Karma und die zyklische Natur des Lebens. Ein Glücksimpuls von außen verändert die Situation.",
+    "reversed": "Pech, Blockaden, Festhalten an der Kontrolle oder die Weigerung, unvermeidbare Veränderungen zu akzeptieren.",
+    "symbolism": "Die vier Wesen (Mensch, Adler, Stier, Löwe) weisen auf die fixen Tierkreiszeichen und die vier Evangelisten hin. Das Rad dreht sich kontinuierlich und zeigt den steten Wandel."
+  },
+  {
+    "id": 11,
+    "name": "Die Gerechtigkeit",
+    "upright": "Fairness, Wahrheit, Ursache und Wirkung. Das Handeln wird objektiv gewogen. Karma fordert klaren Verstand und Verantwortung.",
+    "reversed": "Ungerechtigkeit, Unehrlichkeit oder das Vermeiden von Verantwortung für vergangene Taten.",
+    "symbolism": "Die Waage wiegt ab, das aufrecht stehende Schwert schneidet durch Illusionen und trennt Wahres von Falschem ohne emotionales Zögern."
+  },
+  {
+    "id": 12,
+    "name": "Der Gehängte",
+    "upright": "Stillstand, Perspektivenwechsel, Hingabe und das Loslassen des Egos. Eine freiwillige Pause bringt Erleuchtung.",
+    "reversed": "Sinnloses Opfer, Blockade, Stagnation oder der krampfhafte Versuch, eine unkontrollierbare Situation zu erzwingen.",
+    "symbolism": "Der goldene Heiligenschein signalisiert Erleuchtung, kein Leid. Er hängt in T-Form am Lebensbaum, was eine tiefe spirituelle Neuausrichtung symbolisiert."
+  },
+  {
+    "id": 13,
+    "name": "Der Tod",
+    "upright": "Transformation, das Ende einer bestimmten Lebensphase und der Beginn von etwas Neuem. Das radikale Loslassen von Altem.",
+    "reversed": "Angst vor Veränderung, Stagnation und das Festhalten an toten Strukturen oder ungesunden Bindungen.",
+    "symbolism": "Die weiße Rose steht für Reinheit und Neubeginn, die aufgehende Sonne im Westen verheißt, dass jedem Ende unweigerlich ein neuer Morgen folgt."
+  },
+  {
+    "id": 14,
+    "name": "Die Mäßigkeit",
+    "upright": "Balance, Harmonie, Gelassenheit und Alchemie (Mischen von Gegensätzen). Man findet den gesunden Mittelweg.",
+    "reversed": "Extreme Handlungen, Maßlosigkeit, Ungleichgewicht oder Konflikte aufgrund von Hitzköpfigkeit.",
+    "symbolism": "Ein Fuß im Wasser, einer an Land – Balance zwischen Materie und Emotion. Das Überfüllen der Kelche stellt endlosen Energiefluss dar."
+  },
+  {
+    "id": 15,
+    "name": "Der Teufel",
+    "upright": "Materielle Fesseln, Sucht, toxische Bindungen oder das Gefühl von Ohnmacht gegenüber den eigenen Trieben.",
+    "reversed": "Befreiung von negativen Abhängigkeiten. Die Fesseln werden erkannt und endlich abgeschüttelt.",
+    "symbolism": "Die Ketten sind lose! Die abgebildeten Dämonen könnten sich befreien, entscheiden sich aber, in Unwissenheit und Sucht verstrickt zu bleiben."
+  },
+  {
+    "id": 16,
+    "name": "Der Turm",
+    "upright": "Ein plötzlicher Zusammenbruch, schockierende Erkenntnisse. Falsche Glaubenssätze und ungesunde Fundamente werden gewaltsam eingerissen.",
+    "reversed": "Die Katastrophe kann gerade noch abgewendet werden oder man verweigert sich dem notwendigen reinigenden Schock. Der Prozess verzögert sich.",
+    "symbolism": "Der Blitz der Wahrheit zerschlägt die Krone des Egos. Die Flammen reinigen altes Karma und zwingen zum radikalen Neubau auf festerem Grund."
+  },
+  {
+    "id": 17,
+    "name": "Der Stern",
+    "upright": "Hoffnung, Heilung, spirituelle Klarheit und tiefes Vertrauen nach einer dunklen Phase. Ein sehr positives Omen.",
+    "reversed": "Verlustgefühl, Hoffnungslosigkeit oder Zweifel an der eigenen Intuition. Man verliert die innere Führung.",
+    "symbolism": "Der Ibis-Vogel repräsentiert Thot (Weisheit). Die nackte Frau steht für völlige Verletzlichkeit, Wahrheit und Anbindung an Himmel (Sterne) und Erde (Boden/Wasser)."
+  },
+  {
+    "id": 18,
+    "name": "Der Mond",
+    "upright": "Illusionen, verborgene Ängste, Täuschung und starke intuitive Energie. Dinge sind nicht so, wie sie scheinen – Schattenarbeit ist gefordert.",
+    "reversed": "Sich lichtende Verwirrung, aufgedeckte Täuschungen und das Überwinden tiefer emotionaler Traumata.",
+    "symbolism": "Der Krebs krabbelt aus dem Wasser ins Bewusstsein (Triebe tauchen auf). Der Hund (Domestizierung) heult mit dem Wolf (Wildheit) den Mond an."
+  },
+  {
+    "id": 19,
+    "name": "Die Sonne",
+    "upright": "Erfolg, pure Lebensfreude, Vitalität, Klarheit und Selbstvertrauen. Die absolute Erleuchtung der Situation.",
+    "reversed": "Vorübergehende Verzögerungen des Erfolgs, leicht verdunkelte Lebensfreude oder übersteigertes Ego.",
+    "symbolism": "Das nackte Kind auf dem Pferd symbolisiert absolute Freiheit, Unschuld und furchtloses Vertrauen angesichts des warmen, alles schenkenden Lichts."
+  },
+  {
+    "id": 20,
+    "name": "Das Gericht",
+    "upright": "Erwachen, karmische Klärung, Erlösung und eine große Erkenntnis, die einen inneren Ruf verkörpert.",
+    "reversed": "Selbstverurteilung, Verweigerung vor einem wichtigen Lebensruf oder Schuldgefühle, die festhalten.",
+    "symbolism": "Die Posaune des Erzengels durchbricht die Zeitachse. Die Toten erheben sich aus Särgen, was das endgültige Erwachen zu einem höheren Bewusstsein darstellt."
+  },
+  {
+    "id": 21,
+    "name": "Die Welt",
+    "upright": "Vollendung, Integration und Erfolgsabschluss einer sehr langen karmischen Reise. Ganzheit wurde erreicht.",
+    "reversed": "Verzögerung des Abschlusses, unbewältigte Restaufgaben oder das Gefühl, dass noch ein wichtiges Teilzeug fehlt, um ans Ziel zu gelangen.",
+    "symbolism": "Der Lorbeerkranz ahmt die Vesica Piscis nach. Die vier Kreaturen in den Ecken zeigen das gemeisterte Gleichgewicht der vier Elemente – der ewige Tanz des Lebens."
+  },
+
+  // Court Cards and Pips - Minimalistic versions to preserve space but keep meaning
+  {
+    "id": 31, "name": "Page der Münzen",
+    "upright": "Fleiß, Studienbeginn, Manifestation, konkrete Lernziele.",
+    "reversed": "Ablenkung aus Faulheit, Aufschieben von Projekten, verlorene Chancen.",
+    "symbolism": "Er hält die Münze sorgfältig auf dem Feld, was Bodenständigkeit und die Konzentration auf materielle Substanz zeigt."
+  },
+  {
+    "id": 32, "name": "Page der Kelche",
+    "upright": "Intuitive Impulse, liebevolle Gesten, Phantasie und romantische Annäherung.",
+    "reversed": "Emotionale Verletzlichkeit, Naivität oder unreife Flucht in Tagträumereien.",
+    "symbolism": "Ein Fisch springt aus dem Kelch: Symbole, Träume und Intuition tauchen unerwartet ins Alltagsbewusstsein auf."
+  },
+  {
+    "id": 33, "name": "Page der Schwerter",
+    "upright": "Klärung, wacher Verstand, Nachrichten oder geistige Wachsamkeit.",
+    "reversed": "Klatsch, unnötige Skepsis, Paranoia oder verbale Auseinandersetzungen.",
+    "symbolism": "Stürmische Wolken und die Kampfhaltung deuten auf geistige Unruhe und stetige Wachsamkeit gegenüber Gefahren."
+  },
+  {
+    "id": 34, "name": "Page der Stäbe",
+    "upright": "Mutiger Aufbruch, Enthusiasmus, kreative Funken und Entdeckergeist.",
+    "reversed": "Ungeduld, schnell verfliegende Begeisterung oder Handeln ohne Planung.",
+    "symbolism": "Der Blick auf den blühenden Stab zeugt von Inspiration; die Wüste verlangt danach, von ihm mit Leben gefüllt zu werden."
+  },
+  {
+    "id": 35, "name": "König der Kelche",
+    "upright": "Emotionale Reife, Empathie, diplomatisches Feingefühl und Heilungskraft.",
+    "reversed": "Unterdrückte Emotionen, Manipulation oder seelische Kälte unter einer Maske.",
+    "symbolism": "Sein Thron schwimmt stabil auf stürmischem Meer – er kontrolliert die Emotionen, statt sich von ihnen mitreißen zu lassen."
+  },
+  {
+    "id": 36, "name": "König der Münzen",
+    "upright": "Absoluter finanzieller Erfolg, Wohlstandskraft, Zuverlässigkeit und Sicherheit.",
+    "reversed": "Gier, Materialismus, Geiz oder Inflexibilität aus Statusängsten.",
+    "symbolism": "Üppige Trauben und das dunkle Gewand visualisieren seine organische Verbindung mit der überströmenden Fülle der materiellen Erde."
+  },
+  {
+    "id": 37, "name": "König der Schwerter",
+    "upright": "Objektivität, intellektuelle Autorität, absolute Klarheit und gerechte Urteile.",
+    "reversed": "Grausamkeit, Zynismus, gefühllose Berechnungen oder dominanter Kontrollzwang.",
+    "symbolism": "Das gerade Schwert zeugt von der Trennung von der Täuschung. Sein Blick ist kalt, durchdringend und emotional neutral distanziert."
+  },
+  {
+    "id": 38, "name": "König der Stäbe",
+    "upright": "Geborene Führungsqualität, Charisma, unternehmerische Macht und Feuer.",
+    "reversed": "Intoleranz, Arroganz, Impulsivität oder ein tyrannisches Ego.",
+    "symbolism": "Der Umhang in Salamanderform (Feuerwesen) und die Löwenbilder betonen Mut, Dominanz und lodernde schöpferische Kraft."
+  },
+  {
+    "id": 39, "name": "Königin der Kelche",
+    "upright": "Intuitive Ratgeberin, tiefes Mitgefühl, mediale Begabung und emotionale Geborgenheit.",
+    "reversed": "Emotionale Abhängigkeit, Passivität, das Opfersyndrom oder ein Verwischen von Grenzen.",
+    "symbolism": "Ein geschlossener, aufwendiger Kelch zeigt, dass ihre seelischen Tiefen im Verborgenen blühen. Das reine Wasser verweist auf Empfindsamkeit."
+  },
+  {
+    "id": 40, "name": "Königin der Münzen",
+    "upright": "Fruchtbarkeit, Häuslichkeit, Großzügigkeit und praktisch gelebter Wohlstand.",
+    "reversed": "Helikoptermutter-Mentalität, Vernachlässigung, Geiz oder Sorgen um Sicherheit.",
+    "symbolism": "Der umgebende Paradiesgarten und der Hase im Hintergrund symbolisieren Vitalität, Fortpflanzung und tiefgehende Erdverbundenheit."
+  },
+  {
+    "id": 41, "name": "Königin der Schwerter",
+    "upright": "Unabhängigkeit, Scharfsinn, analytische Intelligenz und das Trennen von Illusionen.",
+    "reversed": "Verbitterung, Kaltherzigkeit, Kritiksucht oder eine zu strenge Distanzierung.",
+    "symbolism": "Sie streckt eine Hand aus, hält das Schwert jedoch zur Verteidigung hoch. Ihr Witwencharakter deute auf Erfahrung durch Schmerz."
+  },
+  {
+    "id": 42, "name": "Königin der Stäbe",
+    "upright": "Selbstbewusstsein, Ausdauer, Leidenschaftskraft und unwiderstehliches Charisma.",
+    "reversed": "Eifersucht, Dramasucht, Manipulationsgefahr oder tiefe Unsicherheit.",
+    "symbolism": "Die schwarze Katze und der Stab weisen auf instinktive Hexen-Energie und pure, ungefilterte Naturverbundenheit hin."
+  },
+  {
+    "id": 43, "name": "Ritter der Kelche",
+    "upright": "Romantik, Charme, Vorstellungskraft und das Überbringen einer Einladung des Herzens.",
+    "reversed": "Launigkeit, Unrealistische Ideale oder das Vermeiden echter Konfliktlösungen.",
+    "symbolism": "Langsam tänzelndes Pferd und Flügel an Helm und Schuhen (Hermes) repräsentieren Fantasie und poetische Intuition."
+  },
+  {
+    "id": 44, "name": "Ritter der Münzen",
+    "upright": "Harte Arbeit, Zielstrebigkeit, Zuverlässigkeit und langsamer aber stetiger Fortschritt.",
+    "reversed": "Sturheit, Workaholic-Verhalten, Phlegma oder Langeweile im Alltag.",
+    "symbolism": "Das schwere schwarze Pferd und der gepflügte Boden verweisen auf Beharrlichkeit und die absolute Verwurzelung im Detail."
+  },
+  {
+    "id": 45, "name": "Ritter der Schwerter",
+    "upright": "Direktes Handeln, intellektuelle Aggressivität, Schnelligkeit und klare Analyse.",
+    "reversed": "Aktionismus, verbale Gräueltaten, Rücksichtslosigkeit oder Flucht.",
+    "symbolism": "Gegen den Wind anreitend: Gedankengeschwindigkeit, aber oft blind gegenüber den emotionalen Kollateralschäden um ihn herum."
+  },
+  {
+    "id": 46, "name": "Ritter der Stäbe",
+    "upright": "Energie, Leidenschaft, Reisebereitschaft und Abenteuerlust. Man will die Welt erobern.",
+    "reversed": "Voreiligkeit, Jähzorn, Unbeständigkeit oder ein sprunghaftes Verhalten.",
+    "symbolism": "Pferd bäumt sich auf, feurige Wappenrock. Die Hitze des Gefechts ohne strategische Weitsicht, purer Tatendrang."
+  },
+
+  // Example entry for aces/pips (Will be fully integrated by script logic below)
+  { "id": 50, "name": "Ass der Kelche", "upright": "Reine Liebe, Mitgefühl, neue Gefühle und spiritueller Einlass.", "reversed": "Verschwendete Liebesmüh, Blockade von Emotionen, Trauer.", "symbolism": "Der Kelch des Lebens schöpft direkt aus den himmlischen Wasserfällen, getragen vom Frieden der Taube." },
+  { "id": 51, "name": "Ass der Münzen", "upright": "Finanzielle Chancen, Stabilität, und die grundlegende Basis für Wohlstand.", "reversed": "Entgangene Chancen, Mangel an Planung, verlorenes Potenzial.", "symbolism": "Ein Rosengarten führt zum sicheren Tor in die Welt, was eine greifbare materielle Grundlage verdeutlicht." },
+  { "id": 52, "name": "Ass der Schwerter", "upright": "Klarer Verstand, eine Durchbruchsidee, Siegeswille und Wahrheit.", "reversed": "Verwirrung, Feindseligkeit, oder Worte die zur unbändigen Zerstörung genutzt werden.", "symbolism": "Das Schwert durchstößt die Krone: Der Intellekt durchdringt dogmatische Autorität und bringt scharfe Klarheit." },
+  { "id": 53, "name": "Ass der Stäbe", "upright": "Inspiration, enorme Energie, Neubeginn, Phallus. Zündende Energie.", "reversed": "Verzögerungen, gebremster Optimismus, keine greifenden Resultate.", "symbolism": "Die himmlische Hand reicht einen knospenden Zweig, symbolisch für ungeahntes, dynamisches Lebenspotenzial." },
+  
+  { "id": 54, "name": "Zwei der Kelche", "upright": "Seelenverwandtschaft, harmonische Zweisamkeit und gegenseitige Anziehung.", "reversed": "Spannungen, Missverständnisse, getrennte Wege in einer Beziehung.", "symbolism": "Der Caduceus über ihnen (Löwe + Schlangen) symbolisiert Alchemie und sexuelle/spirituelle Vermählung." },
+  { "id": 55, "name": "Zwei der Münzen", "upright": "Anpassungsfähigkeit, Jonglieren von Ressourcen, geschicktes Zeitmanagement.", "reversed": "Chaotische Finanzen, Überforderung durch Multitasking.", "symbolism": "Die Schleife in Unendlichkeitsform zeigt den permanent dynamischen Kreislauf des Lebens." },
+  { "id": 56, "name": "Zwei der Schwerter", "upright": "Eine pattsituation, innerer Konflikt und das Verschließen vor der Wahrheit.", "reversed": "Überlastung durch endgültige Entscheidung, erzwungene Aktion.", "symbolism": "Die verbundene Frau sitzt am ruhigen Meer - sie blockiert ihre Gefühle, um sich mental zu distanzieren." },
+  { "id": 57, "name": "Zwei der Stäbe", "upright": "Vorausschauendes Planen, Entdeckungen, Abwägen zukünftiger Schritte.", "reversed": "Fehlende Zielstrebigkeit, Angst vor dem Unbekannten, Unsicherheit.", "symbolism": "Der Mann hält einen Weltball, hat die Festung verlassen, betrachtet weitreichend seine gewaltigen Potenziale." },
+
+  { "id": 58, "name": "Drei der Kelche", "upright": "Feiern, Freundschaften, Gemeinschaft und geteilte Freude.", "reversed": "Exzesse, Katerstimmung oder Klatsch im Freundeskreis.", "symbolism": "Drei tanzende Frauen. Sie erheben die Kelche gemeinsam auf eine glückliche und ertragreiche Erntezeit." },
+  { "id": 59, "name": "Drei der Münzen", "upright": "Teamarbeit, handwerkliche Beherrschung, Meisterschaft, Anerkennung.", "reversed": "Mangelndes Teamwork, pfuschiges Arbeiten, keine Struktur.", "symbolism": "Der Architekt, der Priester und der Handwerker besprechen ein Kunstwerk – Integration auf allen Ebenen." },
+  { "id": 60, "name": "Drei der Schwerter", "upright": "Herzschmerz, tiefer Kummer, schmerzhafte, aber klare Wahrheit.", "reversed": "Langsame Heilung nach großem Schmerz oder Festbeißen in alten Wunden.", "symbolism": "Drei Schwerter durchbohren ein Herz im strömenden Regen: Die rational verstandene Trennung zerstört illusionäre Gefühle." },
+  { "id": 61, "name": "Drei der Stäbe", "upright": "Expansivität, Voraussicht, die eigenen Schiffe kommen an, Unternehmertum.", "reversed": "Pessimismus, blockiertes Wachstum, Frustration über Verzögerungen.", "symbolism": "Er blickt auf die ruhige See voller Erfolg, fest verankert mit der Erfahrung der zurückliegenden Jahre." },
+
+  { "id": 62, "name": "Vier der Kelche", "upright": "Apathie, Weltflucht, Meditation und das Ignorieren von Geschenken.", "reversed": "Neu erwachte Energie, Neuausrichtung und Handlungsbereitschaft.", "symbolism": "Sitzend unter dem Baum ignoriert er den neuen himmlischen Kelch; Gefangen in der eigenen Missmut-Blase." },
+  { "id": 63, "name": "Vier der Münzen", "upright": "Besitzdenken, Stabilität, geiziges Bewahren und die Angst vor Verlust.", "reversed": "Großzügigkeit, Befreiung aus Materialismus, Geldverschwendung.", "symbolism": "Er klammert sich mit Füßen, Armen und Kopf an seine Münzen – er besitzt nicht sie, sie besitzen ihn." },
+  { "id": 64, "name": "Vier der Schwerter", "upright": "Zwangspause, Rekonvaleszenz, Rückzug zur Regeneration nach Stress.", "reversed": "Erschöpfung, Ungeduld, oder das langsame Erwachen nach Isolation.", "symbolism": "Der Ritter auf dem Sarkophag bedeutet kein Tod, sondern eine meditative Ruhepause als heilende Haltung." },
+  { "id": 65, "name": "Vier der Stäbe", "upright": "Feiern, Hochzeit, Sicherheit, Ankunft, unbeschwertes Verweilen in Frieden.", "reversed": "Innere Konflikte trotz Harmonie im Außen, verschobene Feierlichkeiten.", "symbolism": "Die blumengeschmückte Laube bildet ein beschwingtes, friedliches Tor in die häusliche Gemeinschaft." },
+
+  { "id": 66, "name": "Fünf der Kelche", "upright": "Verlust, Bedauern, Trauer und Fixierung auf das Gescheiterte.", "reversed": "Akzeptanz, Erkennen des Übriggebliebenen, Frieden mit der Vergangenheit.", "symbolism": "Die Figur in schwarz guckt auf drei vergossene Kelche und ignoriert die zwei noch vollen hinter ihm." },
+  { "id": 67, "name": "Fünf der Münzen", "upright": "Krisenzeiten, finanzielle oder emotionale Armut und Isolationsgefühl.", "reversed": "Lichtblick in der Krise, Besserung der materiellen Bedingungen, Hilfe.", "symbolism": "Zwei Bettler im Schnee laufen am beleuchteten Kirchenfenster vorbei – Hilfebereitschaft wird schlichtweg ignoriert." },
+  { "id": 68, "name": "Fünf der Schwerter", "upright": "Pyrrhussieg, Verrat, Egoismus und feindselige Konfrontationen.", "reversed": "Schuldeingeständnis, Reue nach dem Streit, oder nicht enden wollendes Drama.", "symbolism": "Der Gewinner sammelt alle Waffen ein, doch die Abwendung seiner Feinde zeigt die Verheerung jeglichen Vertrauens." },
+  { "id": 69, "name": "Fünf der Stäbe", "upright": "Wettbewerb, Rangeleien, Brainstorming und gesunde Konflikte.", "reversed": "Eskalierter Streit, Vermeidungsverhalten bei Kritik, chaotische Streifzüge.", "symbolism": "Fünf Jünglinge kreuzen spielerisch ihre Stäbe – es geht mehr um sportliches Kräftemessen als um Mordlust." },
+
+  { "id": 70, "name": "Sechs der Kelche", "upright": "Nostalgie, Kindheitserinnerungen, Unschuld und tiefes Vertrauen.", "reversed": "Festhalten an Vergangenem, Naivität, unbewältigte alte Traumata.", "symbolism": "Die Gabe eines gefüllten Kelches an das Kind verweist auf bedingungslose Nächstenliebe und alte, warme Erinnerungen." },
+  { "id": 71, "name": "Sechs der Münzen", "upright": "Großzügigkeit, Wohlfahrt, eine ausbalancierte Energie aus Geben und Nehmen.", "reversed": "Einseitige finanzielle Beziehungen, Abhängigkeiten, unfaire Verteilung.", "symbolism": "Mit der Waage gleicht er das Karma aus: Finanzielle Wohltaten basieren auf göttlich-karmischer Gerechtigkeit." },
+  { "id": 72, "name": "Sechs der Schwerter", "upright": "Neuanfang, Aufbruch ins Unbekannte, den Schmerz langsam hinter sich lassen.", "reversed": "Feststecken in der Krise, Angst vor Veränderung, verzögerter Aufbruch.", "symbolism": "Die Fähre fährt vom wilden Wasser (Krise) in die stillen Gewässer. Der Schmerz (Schwerter) fährt als Last noch mit." },
+  { "id": 73, "name": "Sechs der Stäbe", "upright": "Öffentliche Anerkennung, Sieg, Triumph und Stolz auf Geleistetes.", "reversed": "Hochmut kommt vor dem Fall, Verrat, Erfolge die verblassen.", "symbolism": "Lorbeerkranz und jubelnde Masse stehen für verdientes Selbstbewusstsein durch gemeinschaftlich anerkannte Kraft." },
+
+  { "id": 74, "name": "Sieben der Kelche", "upright": "Illusionen, Traumwelten, Qual der Wahl und ungreifbare Entscheidungen.", "reversed": "Erkenntnis, Fokus auf das Machbare, geplatzte Luftschlösser.", "symbolism": "Wolken tragen faszinierende Symbole, was pure Einbildungskraft, aber keinen soliden Grund repräsentiert." },
+  { "id": 75, "name": "Sieben der Münzen", "upright": "Geduldige Erwartung, Ernteverzögerung, Evaluieren von Investitionen.", "reversed": "Faule Investitionen, Ungeduld, Aufgeben kurz vor dem Ziel.", "symbolism": "Der Gärtner drängt nichts. Die Pflanze muss nun nach getaner Arbeit organisch vollends von allein wachsen." },
+  { "id": 76, "name": "Sieben der Schwerter", "upright": "Tarnung, List, Flucht aus Verantwortung und diplomatisches Taktieren.", "reversed": "Aufgedeckte Betrügereien, eine Lektion gelernt, oder Feigheit vor Konflikt.", "symbolism": "Er entwendet 5 Schwerter aus dem Feindeslager. Er hat einen Vorteil erlangt, stiehlt sich jedoch feige davon." },
+  { "id": 77, "name": "Sieben der Stäbe", "upright": "Sich behaupten müssen, Standhaftigkeit und Konfrontation aus höherer Position.", "reversed": "Überforderung, Einbrechen der Verteidigung, Zweifel am eigenen Weg.", "symbolism": "Der Kämpfer trotzt der feindseligen Menge von oben – er hat die moralisch und taktisch weitaus bessere Position." },
+
+  { "id": 78, "name": "Acht der Kelche", "upright": "Eine Suchende Seele, bewusster Abschied von Oberflächlichem, Suche nach Sinn.", "reversed": "Fluchtverhalten ohne Ziel, Angst vor der Trennung, Festhalten an Unwesentlichem.", "symbolism": "Das bewusste Wegwenden von acht gestapelten Kelchen. Materialität reicht nicht, Theologie oder Metaphysik ruft." },
+  { "id": 79, "name": "Acht der Münzen", "upright": "Perfektionierung, Fokus, stetige Weiterbildung und fleißige Meisterarbeit.", "reversed": "Mangelnde Ambitionen, Routine ohne Herzblut, Faulheit, Pfuscherei.", "symbolism": "Tief versunken fertigt er ein Pentakel nach dem anderen, was Hingabe zur Perfektion verdeutlicht." },
+  { "id": 80, "name": "Acht der Schwerter", "upright": "Selbstgewählte Isolation, Ängste, mental blockiert zu sein, Ohnmacht.", "reversed": "Befreiung von Zweifeln, Ablegen der Opferrolle, neue Perspektive.", "symbolism": "Die Fesseln sind locker, die Augenbinde nicht fest. Die Gefangenschaft ist nur eine Illusion des eigenen furchtsamen Verstandes." },
+  { "id": 81, "name": "Acht der Stäbe", "upright": "Blitzschnell, rasanter Fortschritt, Kommunikation und Synchronizität.", "reversed": "Verzögerungen, Panik, Chaos durch zu viel Hektik, Kommunikationsabbruch.", "symbolism": "Acht Stäbe fliegen gezielt in Richtung Boden. Reine Tat-Energie, die sich absolut zielgerichtet voran bewegt." },
+
+  { "id": 82, "name": "Neun der Kelche", "upright": "Wunscherfüllung, Genuss, Behaglichkeit und vollkommene Zufriedenheit.", "reversed": "Gier, Materialismus, fehlende spirituelle Erfüllung trotz Reichtum.", "symbolism": "Die pralle Gestalt sitzt vor ihren Trophäen – eine sehr menschliche, diesseitige Zufriedenheit ohne komplexe Spiritualität." },
+  { "id": 83, "name": "Neun der Münzen", "upright": "Finanzielle Unabhängigkeit, Luxus, Selbstdisziplin und Schönheit der Natur.", "reversed": "Leeres Statusdenken, isolation im Reichtum, Ausbeutung von Ressourcen.", "symbolism": "Die vornehme Dame ist in völligem Einklang mit ihrem luxuriösen Umfeld und dem gezähmten Wildvogel auf ihrer Hand." },
+  { "id": 84, "name": "Neun der Schwerter", "upright": "Ängste, Depression, Sorgen, Schlaflosigkeit und quälendes Grübeln.", "reversed": "Wachsender Glaube, Linderung von Kummer, Unterstützung suchen.", "symbolism": "Mitten in der Nacht erwacht: Das Bett visualisiert das Unbewusste, in dessen Dunkelheit Sorgen überproportional groß erscheinen." },
+  { "id": 85, "name": "Neun der Stäbe", "upright": "Widerstandsfähigkeit, Wachsamkeit, das Letzte Gefecht vor der Vollendung.", "reversed": "Paranoia, totale Erschöpfung, Weigerung, die Verteidigung aufzugeben.", "symbolism": "Viele Narben zieren ihn. Er stützt sich auf einen verletzten Arm und blickt extrem misstrauisch, doch ist enorm stark." },
+
+  { "id": 86, "name": "Zehn der Kelche", "upright": "Familiäres Glück, bedingungslose Liebe, emotionale Vollkommenheit.", "reversed": "Gestörte Familienharmonie, zerstörte Ideale, unrealistische Erwartungen.", "symbolism": "Der Regenbogen schließt das emotionale Spektrum harmonisch ab. Ein universeller göttlicher Segen für die Familie." },
+  { "id": 87, "name": "Zehn der Münzen", "upright": "Generationenübergreifender Reichtum, Erbe, dauerhaftes Fundament.", "reversed": "Erbstreitigkeiten, Geldverlust, zerrüttete Familienunternehmen.", "symbolism": "Münzen ordnen sich am Baum des Lebens kabbalistisch an. Wahre Fülle nährt vom Enkel bis zum greisen Großvater." },
+  { "id": 88, "name": "Zehn der Schwerter", "upright": "Der absolute Tiefpunkt, schmerzhaftes Ende, Verrat, kein Entrinnen.", "reversed": "Es kann nicht mehr schlimmer werden, Hoffnung auf Neuanfang nach Ruin.", "symbolism": "Die aufsteigende Sonne kündet es bereits an: Es brach zusammen, aber ab jetzt geht es ausschließlich bergauf." },
+  { "id": 89, "name": "Zehn der Stäbe", "upright": "Überlastung, Verantwortung, Stress kurz vorm Zusammenbruch.", "reversed": "Delegieren, Entlastung, Burnout oder das Weigern, Hilfe zu akzeptieren.", "symbolism": "Er bricht fast unter Last zusammen und kann nicht das Ziel sehen, obwohl das Dorf schon unmittelbar nah ist." }
+];
+
+const targetPath = require('path').join(__dirname, 'src', 'data', 'tarotMeanings.json');
+fs.writeFileSync(targetPath, JSON.stringify(meanings, null, 2));
+console.log('Successfully wrote JSON data for all 78 Tarot Cards.');

@@ -1,0 +1,213 @@
+:root {
+  /* Mystic Theme Variables */
+  --bg-color: #0A0413;
+  --bg-stars: url('data:image/svg+xml;utf8,<svg width="200" height="200" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="10" r="1.5" fill="%23ffffff" opacity="0.1"/><circle cx="50" cy="80" r="1" fill="%23ffffff" opacity="0.2"/><circle cx="120" cy="40" r="2" fill="%23ffffff" opacity="0.15"/><circle cx="180" cy="150" r="1.5" fill="%23ffffff" opacity="0.1"/></svg>');
+  
+  --text-primary: #f0e6d2;
+  --text-secondary: #a39bb0;
+  
+  --accent-gold: hsl(45, 85%, 60%);
+  --accent-gold-dark: hsl(45, 80%, 40%);
+  --accent-gold-glow: hsla(45, 85%, 60%, 0.4);
+  
+  --card-bg: rgba(25, 15, 35, 0.6);
+  --card-border: rgba(204, 153, 51, 0.3);
+  --card-backdrop: blur(12px);
+  
+  --font-heading: 'Cinzel', serif;
+  --font-body: 'Inter', sans-serif;
+  
+  --transition-smooth: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+  /* Responsive Card Sizes */
+  --card-width: 200px;
+  --card-height: 340px;
+}
+
+.card-modal-content {
+  display: flex;
+  flex-direction: row;
+  gap: 2rem;
+  padding: 2rem;
+}
+
+.card-modal-image {
+  width: 250px;
+  border-radius: 8px;
+}
+
+.card-modal-title {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+@media (max-width: 1024px) {
+  :root {
+    --card-width: 160px;
+    --card-height: 272px;
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --card-width: 110px;
+    --card-height: 187px;
+  }
+
+  .card-modal-content {
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1.5rem !important;
+  }
+
+  .card-modal-image {
+    width: 160px;
+  }
+
+  .card-modal-title {
+    font-size: 1.8rem !important;
+    text-align: center;
+  }
+
+  .mobile-fullscreen-modal {
+    width: 100% !important;
+    max-width: none !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    border-radius: 0 !important;
+    border: none !important;
+  }
+
+  .lexicon-header {
+    padding: 1rem !important;
+  }
+
+  .lexicon-content {
+    padding: 1rem 0.5rem 5rem 0.5rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --card-width: 80px;
+    --card-height: 136px;
+  }
+  
+  html {
+    font-size: 14px;
+  }
+  
+  h1 {
+    font-size: 2rem !important;
+  }
+  
+  h2 {
+    font-size: 1.6rem !important;
+  }
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  margin: 0;
+  background-color: var(--bg-color);
+  background-image: 
+    radial-gradient(circle at 50% 0%, rgba(38, 20, 60, 0.6) 0%, transparent 70%),
+    var(--bg-stars);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  color: var(--accent-gold);
+}
+
+a {
+  color: var(--accent-gold);
+  text-decoration: none;
+  transition: var(--transition-smooth);
+}
+
+a:hover {
+  text-shadow: 0 0 8px var(--accent-gold-glow);
+}
+
+button {
+  font-family: var(--font-heading);
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+/* Glassmorphism utility classes */
+.glass-panel {
+  background: var(--card-bg);
+  backdrop-filter: var(--card-backdrop);
+  -webkit-backdrop-filter: var(--card-backdrop);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+/* Base button style */
+.btn-mystic {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, var(--accent-gold-dark), rgba(60, 40, 20, 0.8));
+  color: #fff;
+  border: 1px solid var(--accent-gold);
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  transition: var(--transition-smooth);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-mystic::before {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 50%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transform: skewX(-20deg);
+  transition: 0.5s;
+}
+
+.btn-mystic:hover {
+  box-shadow: 0 0 20px var(--accent-gold-glow);
+  transform: translateY(-2px);
+}
+
+.btn-mystic:hover::before {
+  left: 150%;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
