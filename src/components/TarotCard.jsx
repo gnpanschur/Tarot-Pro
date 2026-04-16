@@ -4,7 +4,7 @@ import { TarotContext } from '../context/TarotContext';
 import { Info } from 'lucide-react';
 import { audio } from '../services/audioService';
 
-const TarotCard = ({ cardContext, index, onReveal, onInfoClick }) => {
+const TarotCard = ({ cardContext, index, onReveal, onInfoClick, showName = true }) => {
   const { getCardBackImage } = useContext(TarotContext);
   const [isHovered, setIsHovered] = useState(false);
 
@@ -90,7 +90,7 @@ const TarotCard = ({ cardContext, index, onReveal, onInfoClick }) => {
       </motion.div>
 
       {/* Name Label Underneath */}
-      {isRevealed && (
+      {isRevealed && showName && (
         <motion.div 
           initial={{ opacity: 0 }} 
           animate={{ opacity: 1 }}
@@ -107,7 +107,6 @@ const TarotCard = ({ cardContext, index, onReveal, onInfoClick }) => {
           }}
         >
           {cardContext.name} 
-          {isReversed && <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>(Umgekehrt)</div>}
         </motion.div>
       )}
     </div>

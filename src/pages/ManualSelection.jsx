@@ -23,7 +23,7 @@ const ManualSelection = () => {
 
   const countMap = {
     '1-card': 1, '3-cards': 3, 'simple-cross': 4, 'love': 7,
-    'decision': 5, 'career': 5, 'yes-no-3': 3, 'celtic-cross': 10,
+    'decision': 7, 'career': 5, 'yes-no-3': 3, 'celtic-cross': 10,
     'year': 12, 'shadow': 5, 'spiritual': 7, 'relationship-deep': 7,
     'problem-solution': 3, 'daily-energy': 3
   };

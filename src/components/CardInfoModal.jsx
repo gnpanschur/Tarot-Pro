@@ -14,7 +14,7 @@ const CardInfoModal = ({ card, onClose }) => {
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
         style={{
           position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
-          background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(8px)', zIndex: 1000,
+          background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(8px)', zIndex: 3000,
           display: 'flex', alignItems: 'center', justifyContent: 'center'
         }}
         onClick={onClose}
@@ -34,30 +34,29 @@ const CardInfoModal = ({ card, onClose }) => {
             />
           </div>
           <div style={{ flex: 1, color: 'var(--text-primary)' }}>
-            <h2 className="card-modal-title">{card.name} {isReversed && '(Umgekehrt)'}</h2>
-            <p style={{ color: 'var(--accent-gold)', marginBottom: '1rem', fontFamily: 'var(--font-heading)' }}>
+            <h2 className="card-modal-title">
+              {card.name} <span className="hide-mobile">({isReversed ? 'Umgekehrt' : 'Aufrecht'})</span>
+            </h2>
+            <p style={{ color: 'var(--accent-gold)', marginBottom: '1.5rem', fontFamily: 'var(--font-heading)' }}>
               {card.arcana} {card.suit && `| ${card.suit}`}
             </p>
             
-            <div style={{ marginBottom: '1.5rem' }}>
-              <h4 style={{ color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>Grundbedeutung ({isReversed ? 'Umgekehrt' : 'Aufrecht'}):</h4>
-              <p>{isReversed ? card.reversedMeaning : card.uprightMeaning}</p>
+            <div className={`meaning-section ${!isReversed ? 'active-meaning' : ''}`}>
+              <h4 style={{ color: 'var(--accent-gold)', marginBottom: '0.5rem' }}>Aufrechte Bedeutung:</h4>
+              <p>{card.uprightMeaning}</p>
             </div>
             
-            {/* If viewed in Lexicon, show BOTH upright and reversed for educational purposes! */}
-            {!card.hasOwnProperty('isReversed') && (
-               <div style={{ marginBottom: '1.5rem' }}>
-                 <h4 style={{ color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>Bedeutung Umgekehrt:</h4>
-                 <p>{card.reversedMeaning}</p>
-               </div>
-            )}
+            <div className={`meaning-section ${isReversed ? 'active-meaning' : ''}`}>
+              <h4 style={{ color: 'var(--accent-gold)', marginBottom: '0.5rem' }}>Umgekehrte Bedeutung:</h4>
+              <p>{card.reversedMeaning}</p>
+            </div>
 
-            <div style={{ marginBottom: '1.5rem' }}>
+            <div style={{ marginBottom: '1.5rem', padding: '0 1rem' }}>
               <h4 style={{ color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>Symbolik:</h4>
               <p>{card.symbolism}</p>
             </div>
             
-            <button className="btn-mystic" onClick={onClose} style={{ marginTop: 'auto' }}>Zurück</button>
+            <button className="btn-mystic" onClick={onClose} style={{ marginTop: 'auto', width: '100%' }}>Zurück</button>
           </div>
         </motion.div>
       </motion.div>
