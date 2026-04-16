@@ -4,7 +4,9 @@ export const TarotContext = createContext();
 
 export const TarotProvider = ({ children }) => {
   // Settings State
-  const [apiKey, setApiKey] = useState(() => localStorage.getItem('tarot_apiKey') || '');
+  const [apiKey, setApiKey] = useState(() => {
+    return localStorage.getItem('tarot_apiKey') || import.meta.env.VITE_OPENAI_API_KEY || '';
+  });
   const [cardBackIndex, setCardBackIndex] = useState(() => parseInt(localStorage.getItem('tarot_cardBack')) || 1);
   const [isLexiconOpen, setIsLexiconOpen] = useState(false);
   
