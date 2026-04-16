@@ -30,26 +30,26 @@ const Lexicon = () => {
     >
       {/* Fixed Header */}
       <div className="lexicon-header" style={{
-        padding: '1.5rem 2rem', borderBottom: '1px solid rgba(204,153,51,0.2)',
+        padding: '0.8rem 1rem', borderBottom: '1px solid rgba(204,153,51,0.2)',
         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
         background: 'rgba(0,0,0,0.5)', zIndex: 2010
       }}>
-        <h2 style={{ fontSize: '1.5rem', color: 'var(--accent-gold)', margin: 0, fontFamily: 'var(--font-heading)' }}>Tarot Lexikon</h2>
+        <h2 style={{ fontSize: '1.2rem', color: 'var(--accent-gold)', margin: 0, fontFamily: 'var(--font-heading)' }}>Lexikon</h2>
         <button 
           onClick={() => setIsLexiconOpen(false)}
           className="btn-mystic"
-          style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', fontSize: '1rem' }}
+          style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.4rem 0.8rem', fontSize: '0.9rem' }}
         >
-          <X size={20} /> Schließen
+          <X size={18} /> Schließen
         </button>
       </div>
 
       {/* Scrollable Content */}
       <div className="lexicon-content" style={{ flex: 1, overflowY: 'auto', padding: '2rem 1rem 5rem 1rem' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          <h1 style={{ textAlign: 'center', fontSize: '3rem', marginBottom: '1rem', textShadow: '0 0 20px var(--accent-gold-glow)' }}>Das Buch der Schatten</h1>
-      <p style={{ textAlign: 'center', color: 'var(--text-secondary)', marginBottom: '3rem', fontSize: '1.2rem' }}>
-        Tiefgreifendes Wissen über alle 78 Tarotkarten. Wähle eine Karte aus, um in ihre Symbolik und Deutung einzutauchen.
+          <h1 style={{ textAlign: 'center', fontSize: 'calc(1.5rem + 2vw)', marginBottom: '1rem', textShadow: '0 0 20px var(--accent-gold-glow)' }}>Das Buch der Schatten</h1>
+      <p style={{ textAlign: 'center', color: 'var(--text-secondary)', marginBottom: '2rem', fontSize: '1rem' }}>
+        Tiefgreifendes Wissen über alle 78 Tarotkarten.
       </p>
 
       {/* Direct Select */}
@@ -66,9 +66,9 @@ const Lexicon = () => {
             border: '1px solid var(--accent-gold)',
             color: 'var(--accent-gold)',
             fontFamily: 'var(--font-heading)',
-            fontSize: '1.2rem',
+            fontSize: '1rem',
             width: '100%',
-            maxWidth: '400px',
+            maxWidth: '100%',
             outline: 'none',
             cursor: 'pointer'
           }}

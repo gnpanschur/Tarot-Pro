@@ -19,25 +19,25 @@ const NavBar = () => {
     <>
       <nav style={{ padding: '1rem', borderBottom: '1px solid var(--card-border)', marginBottom: '2rem' }} className="glass-panel">
         <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1.5rem', fontFamily: 'var(--font-heading)' }}>
-            <Sparkles color="var(--accent-gold)" /> Mystic Tarot
+          <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1.2rem', fontFamily: 'var(--font-heading)', minWidth: 'fit-content' }}>
+            <Sparkles color="var(--accent-gold)" /> <span className="nav-label">Mystic Tarot</span>
           </Link>
           
-          <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: 'calc(0.5rem + 1vw)', alignItems: 'center' }}>
             <button onClick={() => {
               const state = audio.toggleAmbience();
               setIsPlaying(state);
             }} style={{ color: isPlaying ? 'var(--accent-gold)' : 'var(--text-secondary)' }}>
               {isPlaying ? <Music size={20} /> : <Music2 size={20} />}
             </button>
-            <button onClick={() => setIsLexiconOpen(true)} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--accent-gold)' }}>
-              <Library size={20} /> Lexikon
+            <button onClick={() => setIsLexiconOpen(true)} style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', color: 'var(--accent-gold)' }}>
+              <Library size={20} /> <span className="nav-label">Lexikon</span>
             </button>
-            <Link to="/journal" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Book size={20} /> Journal
+            <Link to="/journal" style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+              <Book size={20} /> <span className="nav-label">Journal</span>
             </Link>
-            <button onClick={() => setShowSettings(true)} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--accent-gold)', hover: 'var(--accent-gold-glow)' }}>
-              <Settings size={20} /> Settings
+            <button onClick={() => setShowSettings(true)} style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', color: 'var(--accent-gold)' }}>
+              <Settings size={20} /> <span className="nav-label">Settings</span>
             </button>
           </div>
         </div>
