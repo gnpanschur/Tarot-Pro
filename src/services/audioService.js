@@ -3,6 +3,8 @@ class AudioService {
     this.audioCtx = null;
     this.ambienceGain = null;
     this.ambienceSource = null;
+    this.flipSource = null;
+    this.shuffleSource = null;
     this.isAmbiencePlaying = false;
 
     // Real audio files from public/Audio
@@ -28,12 +30,24 @@ class AudioService {
     }
   }
 
+  // Plays the card flip audio file through the AudioContext to prevent interruption
   playFlipSound() {
+    this.init();
+    if (!this.flipSource && this.audioCtx) {
+      this.flipSource = this.audioCtx.createMediaElementSource(this.flipAudio);
+      this.flipSource.connect(this.audioCtx.destination);
+    }
     this.flipAudio.currentTime = 0;
     this.flipAudio.play().catch(e => console.warn("Audio playback failed:", e));
   }
 
+  // Plays the card shuffle audio file through the AudioContext to prevent interruption
   playShuffleSound() {
+    this.init();
+    if (!this.shuffleSource && this.audioCtx) {
+      this.shuffleSource = this.audioCtx.createMediaElementSource(this.shuffleAudio);
+      this.shuffleSource.connect(this.audioCtx.destination);
+    }
     this.shuffleAudio.currentTime = 0;
     this.shuffleAudio.play().catch(e => console.warn("Audio playback failed:", e));
   }
