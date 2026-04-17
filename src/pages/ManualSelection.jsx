@@ -53,7 +53,10 @@ const ManualSelection = () => {
     setSelectedCards(prev => prev.filter(c => c.id !== cardId));
   };
 
-  const handleFinish = () => {
+  const handleFinish = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    if (e && e.stopPropagation) e.stopPropagation();
+
     if (selectedCards.length === neededCount) {
       setCurrentCards(selectedCards);
       navigate('/reading');
@@ -284,7 +287,7 @@ const ManualSelection = () => {
                 onClick={() => setPendingCard(null)}
                 style={{ marginTop: '1.5rem', color: 'var(--text-secondary)', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.3rem', margin: '1.5rem auto 0' }}
               >
-                <X size={16} /> Abbrechen
+                <X size={16} /> Zurück
               </button>
             </motion.div>
           </motion.div>

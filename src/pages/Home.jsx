@@ -21,11 +21,17 @@ const Home = () => {
     setShowModal(true);
   };
 
-  const confirmStartReading = () => {
+  const confirmStartReading = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    if (e && e.stopPropagation) e.stopPropagation();
+    
+    if (!pendingSpread) return; // safety check
+
     setQuestion(localInput);
     setCurrentSpread(pendingSpread);
     setCurrentCards([]);
     setShowModal(false);
+    
     if (isPendingManual) {
       navigate('/manual-selection');
     } else {
@@ -181,10 +187,10 @@ const Home = () => {
               />
               
               <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-                <button className="btn-mystic" onClick={() => setShowModal(false)} style={{ background: 'transparent', border: '1px solid var(--card-border)' }}>
-                  Abbrechen
+                <button type="button" className="btn-mystic" onClick={() => setShowModal(false)} style={{ background: 'transparent', border: '1px solid var(--card-border)' }}>
+                  Zurück
                 </button>
-                <button className="btn-mystic" onClick={confirmStartReading}>
+                <button type="button" className="btn-mystic" onClick={confirmStartReading}>
                   {localInput.trim() ? 'Mit Kontext fortfahren' : 'Ohne Kontext fortfahren'}
                 </button>
               </div>

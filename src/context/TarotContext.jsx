@@ -16,10 +16,27 @@ export const TarotProvider = ({ children }) => {
     return saved ? JSON.parse(saved) : [];
   });
 
-  // Current Reading State
-  const [currentSpread, setCurrentSpread] = useState(null); // type of spread
-  const [currentCards, setCurrentCards] = useState([]); // drawn cards
-  const [question, setQuestion] = useState('');
+  // Current Reading State stored in Session Storage
+  const [currentSpread, setCurrentSpread] = useState(() => sessionStorage.getItem('tarot_currentSpread') || null);
+  const [currentCards, setCurrentCards] = useState(() => {
+    const saved = sessionStorage.getItem('tarot_currentCards');
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [question, setQuestion] = useState(() => sessionStorage.getItem('tarot_question') || '');
+
+  // Persist session state
+  useEffect(() => {
+    if (currentSpread) sessionStorage.setItem('tarot_currentSpread', currentSpread);
+    else sessionStorage.removeItem('tarot_currentSpread');
+  }, [currentSpread]);
+
+  useEffect(() => {
+    sessionStorage.setItem('tarot_currentCards', JSON.stringify(currentCards));
+  }, [currentCards]);
+
+  useEffect(() => {
+    sessionStorage.setItem('tarot_question', question);
+  }, [question]);
 
   // Persist settings
   useEffect(() => {
