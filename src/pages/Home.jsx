@@ -104,8 +104,11 @@ const Home = () => {
         <h1 style={{ fontSize: '3rem', marginBottom: '1rem', textShadow: '0 0 20px var(--accent-gold-glow)' }}>
           Wähle dein Orakel
         </h1>
-        <p style={{ color: 'var(--text-secondary)', maxWidth: '600px', margin: '0 auto', fontSize: '1.2rem', lineHeight: '1.6' }}>
+        <p style={{ color: 'var(--text-secondary)', maxWidth: '700px', margin: '0 auto', fontSize: '1.2rem', lineHeight: '1.6' }}>
           Jede Fragestellung verlangt ein anderes Muster. Wähle die Legetechnik, die am besten zu deiner aktuellen Situation passt.
+          <span style={{ color: 'var(--accent-gold)', display: 'block', marginTop: '1rem', fontWeight: '500' }}>
+            Wenn du eigene, echte Tarotkarten gezogen hast, kannst du diese hier manuell eingeben. Verwende dafür die Option „MANUELL“.
+          </span>
         </p>
       </div>
 
