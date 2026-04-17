@@ -1,16 +1,22 @@
 class AudioService {
   constructor() {
     this.audioCtx = null;
-    this.ambienceOscillators = [];
     this.ambienceGain = null;
+    this.ambienceSource = null;
+    this.isAmbiencePlaying = false;
 
     // Real audio files from public/Audio
     this.flipAudio = new Audio('/Audio/KarteAuf.mp3');
     this.shuffleAudio = new Audio('/Audio/KarteMischen.mp3');
+    this.ambienceAudio = new Audio('/Audio/TarotOrganDrawn.mp3');
     
-    // Pre-load settings
+    // Settings
+    this.ambienceAudio.loop = true;
+    
+    // Pre-load
     this.flipAudio.load();
     this.shuffleAudio.load();
+    this.ambienceAudio.load();
   }
 
   init() {
@@ -22,13 +28,11 @@ class AudioService {
     }
   }
 
-  // Plays the card flip audio file
   playFlipSound() {
     this.flipAudio.currentTime = 0;
     this.flipAudio.play().catch(e => console.warn("Audio playback failed:", e));
   }
 
-  // Plays the card shuffle audio file
   playShuffleSound() {
     this.shuffleAudio.currentTime = 0;
     this.shuffleAudio.play().catch(e => console.warn("Audio playback failed:", e));
@@ -36,36 +40,33 @@ class AudioService {
 
   toggleAmbience() {
     this.init();
-    if (this.ambienceGain) {
-      // Fade out and stop
-      this.ambienceGain.gain.linearRampToValueAtTime(0.01, this.audioCtx.currentTime + 1);
+    
+    if (this.isAmbiencePlaying) {
+      // Fade out
+      if (this.ambienceGain) {
+        this.ambienceGain.gain.linearRampToValueAtTime(0.01, this.audioCtx.currentTime + 2);
+      }
       setTimeout(() => {
-        this.ambienceOscillators.forEach(osc => osc.stop());
-        this.ambienceOscillators = [];
-        this.ambienceGain.disconnect();
-        this.ambienceGain = null;
-      }, 1000);
-      return false; // is playing = false
+        this.ambienceAudio.pause();
+        this.isAmbiencePlaying = false;
+      }, 2000);
+      return false;
     } else {
-      // Start ambient drone (synthesized)
-      this.ambienceGain = this.audioCtx.createGain();
+      // Lazy-init the source node (can only be done once)
+      if (!this.ambienceSource) {
+        this.ambienceSource = this.audioCtx.createMediaElementSource(this.ambienceAudio);
+        this.ambienceGain = this.audioCtx.createGain();
+        this.ambienceSource.connect(this.ambienceGain);
+        this.ambienceGain.connect(this.audioCtx.destination);
+      }
+      
+      // Fade in
       this.ambienceGain.gain.setValueAtTime(0, this.audioCtx.currentTime);
-      this.ambienceGain.gain.linearRampToValueAtTime(0.1, this.audioCtx.currentTime + 3); // Slow fade in
-      this.ambienceGain.connect(this.audioCtx.destination);
-
-      const freqs = [110, 164.81, 220]; // A2, E3, A3 frequencies for a mystic root chord
-      freqs.forEach(freq => {
-        const osc = this.audioCtx.createOscillator();
-        osc.type = 'triangle';
-        
-        // Add extremely slow LFO to frequency for detune effect
-        osc.frequency.value = freq;
-        
-        osc.connect(this.ambienceGain);
-        osc.start();
-        this.ambienceOscillators.push(osc);
-      });
-      return true; // is playing = true
+      this.ambienceGain.gain.linearRampToValueAtTime(0.5, this.audioCtx.currentTime + 3);
+      
+      this.ambienceAudio.play().catch(e => console.warn("Ambience play failed:", e));
+      this.isAmbiencePlaying = true;
+      return true;
     }
   }
 }
