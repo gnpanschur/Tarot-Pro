@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
-import { Sparkles, Book, Settings, Key, Library, Smile, Frown } from 'lucide-react';
+import { Sparkles, Book, Settings, Key, Library, Smile, Frown, Maximize, Minimize } from 'lucide-react';
 import { TarotContext } from '../context/TarotContext';
 import { audio } from '../services/audioService';
 
@@ -9,6 +9,17 @@ const NavBar = () => {
   const [showSettings, setShowSettings] = useState(false);
   const [tempKey, setTempKey] = useState(apiKey);
   const [tempSafetyMode, setTempSafetyMode] = useState(safetyMode);
+  const [isFullscreen, setIsFullscreen] = useState(!!document.fullscreenElement);
+
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().then(() => setIsFullscreen(true)).catch(err => {
+        console.warn(`Error attempting to enable fullscreen: ${err.message}`);
+      });
+    } else {
+      document.exitFullscreen().then(() => setIsFullscreen(false));
+    }
+  };
 
   const saveSettings = () => {
     setApiKey(tempKey);
@@ -31,6 +42,9 @@ const NavBar = () => {
           </Link>
           
           <div style={{ display: 'flex', gap: 'calc(0.5rem + 1vw)', alignItems: 'center' }}>
+            <button onClick={toggleFullscreen} style={{ color: 'var(--accent-gold)' }} title="Vollbild">
+              {isFullscreen ? <Minimize size={20} /> : <Maximize size={20} />}
+            </button>
             <button onClick={() => setIsLexiconOpen(true)} style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', color: 'var(--accent-gold)' }}>
               <Library size={20} /> <span className="nav-label">Lexikon</span>
             </button>
