@@ -99,6 +99,10 @@ const NavBar = () => {
               </button>
             </div>
 
+            <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', opacity: 0.7, marginBottom: '1.5rem', textAlign: 'center', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '1rem' }}>
+              Development and Design: GunPan
+            </div>
+
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', alignItems: 'center' }}>
               <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginRight: 'auto', opacity: 0.5 }}>Vers. 1.0</span>
               <button onClick={() => setShowSettings(false)} style={{ color: 'var(--text-secondary)', background: 'transparent', border: 'none', cursor: 'pointer' }}>Abbrechen</button>
