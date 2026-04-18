@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
-import { Sparkles, Book, Settings, Key, Music, Music2, Library, Smile, Frown } from 'lucide-react';
+import { Sparkles, Book, Settings, Key, Library, Smile, Frown } from 'lucide-react';
 import { TarotContext } from '../context/TarotContext';
 import { audio } from '../services/audioService';
 
@@ -9,17 +9,6 @@ const NavBar = () => {
   const [showSettings, setShowSettings] = useState(false);
   const [tempKey, setTempKey] = useState(apiKey);
   const [tempSafetyMode, setTempSafetyMode] = useState(safetyMode);
-  const [isPlaying, setIsPlaying] = useState(audio.isAmbiencePlaying);
-
-  React.useEffect(() => {
-    // Check every second if the audio service state changed (e.g. via first interaction)
-    const interval = setInterval(() => {
-      if (audio.isAmbiencePlaying !== isPlaying) {
-        setIsPlaying(audio.isAmbiencePlaying);
-      }
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [isPlaying]);
 
   const saveSettings = () => {
     setApiKey(tempKey);
@@ -42,12 +31,6 @@ const NavBar = () => {
           </Link>
           
           <div style={{ display: 'flex', gap: 'calc(0.5rem + 1vw)', alignItems: 'center' }}>
-            <button onClick={() => {
-              const state = audio.toggleAmbience();
-              setIsPlaying(state);
-            }} style={{ color: isPlaying ? 'var(--accent-gold)' : 'var(--text-secondary)' }}>
-              {isPlaying ? <Music size={20} /> : <Music2 size={20} />}
-            </button>
             <button onClick={() => setIsLexiconOpen(true)} style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', color: 'var(--accent-gold)' }}>
               <Library size={20} /> <span className="nav-label">Lexikon</span>
             </button>
