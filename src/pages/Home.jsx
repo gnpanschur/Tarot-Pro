@@ -2,12 +2,12 @@ import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { TarotContext } from '../context/TarotContext';
-import { BookOpen, Heart, Compass, Eye, Map, Briefcase, Zap, Sun, Shield, UserX, Infinity } from 'lucide-react';
+import { BookOpen, Heart, Compass, Eye, Map, Briefcase, Zap, Sun, Shield, UserX, Infinity, Sparkles } from 'lucide-react';
 
 const Home = () => {
   const navigate = useNavigate();
   const { setCurrentSpread, setCurrentCards, setQuestion, question } = useContext(TarotContext);
-  
+
   const [showModal, setShowModal] = useState(false);
   const [pendingSpread, setPendingSpread] = useState(null);
   const [isPendingManual, setIsPendingManual] = useState(false);
@@ -24,14 +24,14 @@ const Home = () => {
   const confirmStartReading = (e) => {
     if (e && e.preventDefault) e.preventDefault();
     if (e && e.stopPropagation) e.stopPropagation();
-    
+
     if (!pendingSpread) return; // safety check
 
     setQuestion(localInput);
     setCurrentSpread(pendingSpread);
     setCurrentCards([]);
     setShowModal(false);
-    
+
     if (isPendingManual) {
       navigate('/manual-selection');
     } else {
@@ -102,22 +102,22 @@ const Home = () => {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ paddingBottom: '4rem' }}>
       <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
         <h1 style={{ fontSize: '3rem', marginBottom: '1rem', textShadow: '0 0 20px var(--accent-gold-glow)' }}>
-          Wähle dein Orakel
+          Wähle deine Legetechnik
         </h1>
         <p style={{ color: 'var(--text-secondary)', maxWidth: '700px', margin: '0 auto', fontSize: '1.2rem', lineHeight: '1.6' }}>
           Jede Fragestellung verlangt ein anderes Muster. Wähle die Legetechnik, die am besten zu deiner aktuellen Situation passt.
           <span style={{ color: 'var(--accent-gold)', display: 'block', marginTop: '1rem', fontWeight: '500' }}>
-            Wenn du eigene, echte Tarotkarten gezogen hast, kannst du diese hier manuell eingeben. Verwende dafür die Option „MANUELL“.
+            Wenn du eigene, echte Tarotkarten hast, verwende die Option „MANUELL“.
           </span>
         </p>
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '4rem' }}>
         {categories.map((cat, idx) => (
-          <div key={idx} style={{ 
-            background: 'var(--card-bg)', 
-            border: '1px solid var(--card-border)', 
-            borderRadius: '24px', 
+          <div key={idx} style={{
+            background: 'var(--card-bg)',
+            border: '1px solid var(--card-border)',
+            borderRadius: '24px',
             padding: '2rem',
             boxShadow: '0 8px 32px rgba(0,0,0,0.4)'
           }}>
@@ -125,7 +125,7 @@ const Home = () => {
               <div style={{ color: cat.color }}>{cat.icon}</div>
               <h2 style={{ fontSize: '1.8rem', color: cat.color }}>{cat.title}</h2>
             </div>
-            
+
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
               {cat.spreads.map(spread => (
                 <div key={spread.id} className="glass-panel hover-glow" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', border: '1px solid rgba(255,255,255,0.05)' }}>
@@ -140,7 +140,7 @@ const Home = () => {
                       {spread.desc}
                     </p>
                   </div>
-                  
+
                   <div style={{ display: 'flex', gap: '0.5rem' }}>
                     <button className="btn-mystic" style={{ flex: 2, padding: '0.8rem', fontSize: '1rem' }} onClick={() => initiateReading(spread.id, false)}>
                       Karten ziehen
@@ -156,10 +156,59 @@ const Home = () => {
         ))}
       </div>
 
+      {/* Instructions and Tarot Info */}
+      <div style={{ marginTop: '6rem', display: 'flex', flexDirection: 'column', gap: '3rem' }}>
+        <div className="glass-panel" style={{ padding: '3rem', border: '1px solid var(--accent-gold)' }}>
+          <h2 style={{ fontSize: '2rem', color: 'var(--accent-gold)', marginBottom: '1.5rem', fontFamily: 'var(--font-heading)' }}>
+            Bedienung des Programmes
+          </h2>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '2rem', textAlign: 'left' }}>
+            <div>
+              <h3 style={{ color: 'var(--accent-gold)', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <Zap size={18} /> 1. Legetechnik wählen
+              </h3>
+              <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>
+                Suche dir aus den Kategorien das passende Legemuster aus. Jedes Muster beleuchtet andere Aspekte deines Themas.
+              </p>
+            </div>
+            <div>
+              <h3 style={{ color: 'var(--accent-gold)', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <BookOpen size={18} /> 2. Kontext mitgeben
+              </h3>
+              <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>
+                Optional kannst du deine Frage oder Situation beschreiben. Dies hilft der KI, eine präzisere Deutung für dich zu erstellen.
+              </p>
+            </div>
+            <div>
+              <h3 style={{ color: 'var(--accent-gold)', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <Sparkles size={18} /> 3. Karten ziehen & deuten
+              </h3>
+              <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>
+                Ziehe die Karten digital oder wähle sie manuell aus. Enthülle sie nacheinander und klicke auf "Interpretation", um die Analyse zu starten.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div style={{ padding: '0 2rem', textAlign: 'center' }}>
+          <h2 style={{ fontSize: '2rem', color: 'var(--accent-gold)', marginBottom: '1.5rem', fontFamily: 'var(--font-heading)' }}>
+            Grundsätzliches über Tarot
+          </h2>
+          <div style={{ color: 'var(--text-secondary)', maxWidth: '800px', margin: '0 auto', lineHeight: '1.8', fontSize: '1.1rem' }}>
+            <p style={{ marginBottom: '1.5rem' }}>
+              Tarot ist ein jahrhundertealtes System der Introspektion, das aus 78 Karten besteht. Es dient als Spiegel für das Unterbewusstsein und ermöglicht einen tieferen Blick auf archetypische Lebenssituationen und spirituelle Entwicklungsphasen.
+            </p>
+            <p>
+              Wichtig zu verstehen ist: Tarot sagt keine unveränderliche Zukunft voraus. Es zeigt aktuelle energetische Tendenzen, innere Blockaden und Potenziale auf. Es ist ein Werkzeug zur Selbstreflexion, das dich dabei unterstützt, bewusstere Entscheidungen zu treffen und deinen eigenen Weg mit mehr Klarheit zu gehen.
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* Input Modal */}
       <AnimatePresence>
         {showModal && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             style={{
               position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
@@ -167,16 +216,16 @@ const Home = () => {
               display: 'flex', alignItems: 'center', justifyContent: 'center'
             }}
           >
-            <motion.div 
+            <motion.div
               initial={{ scale: 0.9 }} animate={{ scale: 1 }} exit={{ scale: 0.9 }}
               className="glass-panel"
               style={{ padding: '3rem', maxWidth: '600px', width: '90%', textAlign: 'center' }}
             >
               <h2 style={{ fontSize: '2rem', color: 'var(--accent-gold)', marginBottom: '1rem' }}>{getModalTitle()}</h2>
               <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem', lineHeight: '1.5' }}>
-                Du kannst der KI hier noch Kontext mitgeben, der intensiv in die Karteninterpretation miteinfließen wird.
+                Du kannst der Legung hier noch Kontext mitgeben, der intensiv in die Karteninterpretation miteinfließen wird.
               </p>
-              
+
               <textarea
                 value={localInput}
                 onChange={(e) => setLocalInput(e.target.value)}
@@ -188,7 +237,7 @@ const Home = () => {
                   resize: 'none', marginBottom: '2rem'
                 }}
               />
-              
+
               <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
                 <button type="button" className="btn-mystic" onClick={() => setShowModal(false)} style={{ background: 'transparent', border: '1px solid var(--card-border)' }}>
                   Zurück
