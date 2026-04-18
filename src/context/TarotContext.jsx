@@ -9,6 +9,10 @@ export const TarotProvider = ({ children }) => {
   });
   const [cardBackIndex, setCardBackIndex] = useState(() => parseInt(localStorage.getItem('tarot_cardBack')) || 1);
   const [isLexiconOpen, setIsLexiconOpen] = useState(false);
+  const [safetyMode, setSafetyMode] = useState(() => {
+    const saved = localStorage.getItem('tarot_safetyMode');
+    return saved !== null ? JSON.parse(saved) : true;
+  });
   
   // Journal State
   const [journal, setJournal] = useState(() => {
@@ -44,6 +48,10 @@ export const TarotProvider = ({ children }) => {
   }, [apiKey]);
 
   useEffect(() => {
+    localStorage.setItem('tarot_safetyMode', JSON.stringify(safetyMode));
+  }, [safetyMode]);
+
+  useEffect(() => {
     localStorage.setItem('tarot_cardBack', cardBackIndex);
   }, [cardBackIndex]);
 
@@ -67,7 +75,8 @@ export const TarotProvider = ({ children }) => {
       currentSpread, setCurrentSpread,
       currentCards, setCurrentCards,
       question, setQuestion,
-      isLexiconOpen, setIsLexiconOpen
+      isLexiconOpen, setIsLexiconOpen,
+      safetyMode, setSafetyMode
     }}>
       {children}
     </TarotContext.Provider>

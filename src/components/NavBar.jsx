@@ -1,18 +1,36 @@
 import React, { useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
-import { Sparkles, Book, Settings, Key, Music, Music2, Library } from 'lucide-react';
+import { Sparkles, Book, Settings, Key, Music, Music2, Library, Smile, Frown } from 'lucide-react';
 import { TarotContext } from '../context/TarotContext';
 import { audio } from '../services/audioService';
 
 const NavBar = () => {
-  const { apiKey, setApiKey, setIsLexiconOpen } = useContext(TarotContext);
+  const { apiKey, setApiKey, setIsLexiconOpen, safetyMode, setSafetyMode } = useContext(TarotContext);
   const [showSettings, setShowSettings] = useState(false);
   const [tempKey, setTempKey] = useState(apiKey);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [tempSafetyMode, setTempSafetyMode] = useState(safetyMode);
+  const [isPlaying, setIsPlaying] = useState(audio.isAmbiencePlaying);
+
+  React.useEffect(() => {
+    // Check every second if the audio service state changed (e.g. via first interaction)
+    const interval = setInterval(() => {
+      if (audio.isAmbiencePlaying !== isPlaying) {
+        setIsPlaying(audio.isAmbiencePlaying);
+      }
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [isPlaying]);
 
   const saveSettings = () => {
     setApiKey(tempKey);
+    setSafetyMode(tempSafetyMode);
     setShowSettings(false);
+  };
+
+  const openSettings = () => {
+    setTempKey(apiKey);
+    setTempSafetyMode(safetyMode);
+    setShowSettings(true);
   };
 
   return (
@@ -36,7 +54,7 @@ const NavBar = () => {
             <Link to="/journal" style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
               <Book size={20} /> <span className="nav-label">Journal</span>
             </Link>
-            <button onClick={() => setShowSettings(true)} style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', color: 'var(--accent-gold)' }}>
+            <button onClick={openSettings} style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', color: 'var(--accent-gold)' }}>
               <Settings size={20} /> <span className="nav-label">Settings</span>
             </button>
           </div>
@@ -58,6 +76,44 @@ const NavBar = () => {
                 placeholder="sk-..." 
                 style={{ background: 'transparent', border: 'none', color: 'white', flex: 1, outline: 'none', fontSize: '1rem' }}
               />
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem', marginBottom: '2rem', marginTop: '1rem' }}>
+              <button 
+                onClick={() => setTempSafetyMode(true)}
+                style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center', 
+                  width: '60px',
+                  height: '60px',
+                  borderRadius: '50%', 
+                  border: tempSafetyMode ? '1px solid var(--accent-gold)' : '1px solid var(--card-border)',
+                  background: tempSafetyMode ? 'rgba(212, 175, 55, 0.1)' : 'rgba(0,0,0,0.3)',
+                  color: tempSafetyMode ? 'var(--accent-gold)' : 'var(--text-secondary)',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s'
+                }}>
+                <Smile size={32} />
+              </button>
+              
+              <button 
+                onClick={() => setTempSafetyMode(false)}
+                style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center', 
+                  width: '60px',
+                  height: '60px',
+                  borderRadius: '50%', 
+                  border: !tempSafetyMode ? '1px solid #ff4444' : '1px solid var(--card-border)',
+                  background: !tempSafetyMode ? 'rgba(255, 68, 68, 0.1)' : 'rgba(0,0,0,0.3)',
+                  color: !tempSafetyMode ? '#ff4444' : 'var(--text-secondary)',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s'
+                }}>
+                <Frown size={32} />
+              </button>
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>

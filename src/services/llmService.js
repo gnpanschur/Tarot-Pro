@@ -1,4 +1,4 @@
-export const interpretReading = async (apiKey, question, spreadType, cards) => {
+export const interpretReading = async (apiKey, question, spreadType, cards, safetyMode = true) => {
   if (!apiKey) throw new Error("API Key fehlt. Bitte in den Einstellungen (Zahnrad) eintragen.");
 
   let spreadContext = "";
@@ -74,7 +74,7 @@ ${cardList}
 Bitte analysiere diese Legung tiefgehend und präzise. Berücksichtige die archetypischen Bedeutungen der Rider-Waite Bilder und wie sie miteinander auf den spezifischen Positionen interagieren. Sprich den Nutzer mystisch und respektvoll an.
 Schließe deine Antwort mit einem fettgeschriebenen **Resümee** (ca. 1-2 Absätze) ab, welches die Quintessenz direkt auf den Punkt bringt.
 Verwende HTML-Tags wie <br>, <strong> oder <em> zur Formatierung des Textflusses (kein Markdown für Bold, sondern HTML, falls nötig).
-Mache niemals Aussagen über Krankheit oder Tod im medizinischen Sinne.`;
+${safetyMode ? 'Mache niemals Aussagen über Krankheit oder Tod im medizinischen Sinne.' : ''}`;
 
   const response = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",

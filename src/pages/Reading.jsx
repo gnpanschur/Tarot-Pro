@@ -8,7 +8,7 @@ import { interpretReading } from '../services/llmService';
 import CardInfoModal from '../components/CardInfoModal';
 
 const Reading = () => {
-  const { currentSpread, currentCards, question, saveToJournal } = useContext(TarotContext);
+  const { currentSpread, currentCards, question, saveToJournal, safetyMode } = useContext(TarotContext);
   const { drawCardsRandomly, revealCard, revealAllCards } = useTarot();
   const navigate = useNavigate();
   const [selectedCardInfo, setSelectedCardInfo] = useState(null);
@@ -232,6 +232,7 @@ const Reading = () => {
     );
   };
 
+
   const isAllRevealed = currentCards.length > 0 && currentCards.every(c => c.isRevealed);
 
   const handleInterpret = async () => {
@@ -241,7 +242,7 @@ const Reading = () => {
     
     try {
       const apiKey = localStorage.getItem('tarot_apiKey');
-      const text = await interpretReading(apiKey, question, currentSpread, currentCards);
+      const text = await interpretReading(apiKey, question, currentSpread, currentCards, safetyMode);
       setInterpretation(text);
       
       // Auto-save to Journal
