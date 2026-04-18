@@ -1,11 +1,13 @@
 class AudioService {
   constructor() {
     this.audioCtx = null;
-    this.ambienceGain = null;
-    this.ambienceSource = null;
     this.flipSource = null;
     this.shuffleSource = null;
+    
+    // Persistent state
     this.isAmbiencePlaying = localStorage.getItem('tarot_ambience_on') === 'true';
+    this.isInitializing = false;
+    this.fadeInterval = null;
 
     // Real audio files from public/Audio
     this.flipAudio = new Audio('/Audio/KarteAuf.mp3');
@@ -14,6 +16,7 @@ class AudioService {
     
     // Settings
     this.ambienceAudio.loop = true;
+    this.ambienceAudio.volume = 0; // Start muted for fading
     
     // Pre-load
     this.flipAudio.load();
@@ -29,17 +32,17 @@ class AudioService {
 
   setupInteractionListeners() {
     const runOnce = async () => {
-      // Remove immediately and synchronously to prevent Folge-Events (click after touch) from triggering this again
-      window.removeEventListener('click', runOnce);
-      window.removeEventListener('touchstart', runOnce);
-      window.removeEventListener('mousedown', runOnce);
+      // Synchronously remove EVERYTHING immediately to stop rapid-fire events
+      window.removeEventListener('click', runOnce, true);
+      window.removeEventListener('touchstart', runOnce, { capture: true });
+      window.removeEventListener('mousedown', runOnce, true);
       
       await this.handleFirstInteraction();
     };
     
-    window.addEventListener('click', runOnce);
-    window.addEventListener('touchstart', runOnce, { passive: true });
-    window.addEventListener('mousedown', runOnce);
+    window.addEventListener('click', runOnce, true);
+    window.addEventListener('touchstart', runOnce, { passive: true, capture: true });
+    window.addEventListener('mousedown', runOnce, true);
   }
 
   async resumeContext() {
@@ -47,22 +50,20 @@ class AudioService {
     if (this.audioCtx && this.audioCtx.state === 'suspended') {
       try {
         await this.audioCtx.resume();
-        console.log("AudioContext resumed successfully");
       } catch (e) {
-        console.error("Failed to resume AudioContext:", e);
+        console.warn("Failed to resume AudioContext:", e);
       }
     }
   }
 
   async handleFirstInteraction() {
     if (this.isInitializing) return;
-    if (this.audioCtx && this.audioCtx.state === 'running' && !this.ambienceAudio.paused) return;
-    
     this.isInitializing = true;
+    
     try {
       await this.resumeContext();
       if (this.isAmbiencePlaying) {
-        this.playAmbience();
+        await this.playAmbience();
       }
     } finally {
       this.isInitializing = false;
@@ -73,7 +74,7 @@ class AudioService {
     if (document.visibilityState === 'visible') {
       await this.resumeContext();
       if (this.isAmbiencePlaying) {
-        // Ensure audio element is actually playing
+        // Just ensure it's playing, fade logic will handle volume
         this.ambienceAudio.play().catch(() => {});
       }
     }
@@ -96,54 +97,47 @@ class AudioService {
   }
 
   async playAmbience() {
+    // 1. Ensure AudioContext is ready for other sounds
     await this.resumeContext();
     
-    if (!this.ambienceSource) {
-      try {
-        this.ambienceSource = this.audioCtx.createMediaElementSource(this.ambienceAudio);
-        this.ambienceGain = this.audioCtx.createGain();
-        this.ambienceSource.connect(this.ambienceGain);
-        this.ambienceGain.connect(this.audioCtx.destination);
-      } catch (e) {
-        console.warn("Source already connected or context issue:", e);
-      }
-      
-      this.audioCtx.onstatechange = () => {
-        if (this.audioCtx.state === 'suspended' && this.isAmbiencePlaying) {
-          this.resumeContext();
-        }
-      };
-    }
-    
-    // Only play if not already playing to prevent "double sound" on some mobile browsers
+    // 2. Start playback if paused
     if (this.ambienceAudio.paused) {
-      this.ambienceAudio.play().catch(e => console.warn("Ambience play failed:", e));
+      try {
+        await this.ambienceAudio.play();
+      } catch (e) {
+        console.warn("Ambience play failed:", e);
+      }
     }
-    
+
     this.isAmbiencePlaying = true;
     localStorage.setItem('tarot_ambience_on', 'true');
     this.updateMediaSession();
 
-    // Reset gain ramp securely
-    if (this.ambienceGain) {
-      const now = this.audioCtx.currentTime;
-      this.ambienceGain.gain.cancelScheduledValues(now);
-      this.ambienceGain.gain.setValueAtTime(this.ambienceGain.gain.value, now);
-      this.ambienceGain.gain.linearRampToValueAtTime(0.5, now + 3);
-    }
+    // 3. Manual volume fading (Pure HTML approach is more robust for mobile doubling)
+    if (this.fadeInterval) clearInterval(this.fadeInterval);
+    this.fadeInterval = setInterval(() => {
+      if (this.ambienceAudio.volume < 0.5) {
+        this.ambienceAudio.volume = Math.min(0.5, this.ambienceAudio.volume + 0.05);
+      } else {
+        clearInterval(this.fadeInterval);
+      }
+    }, 150);
   }
 
   pauseAmbience() {
-    if (this.ambienceGain) {
-      this.ambienceGain.gain.linearRampToValueAtTime(0.01, this.audioCtx.currentTime + 2);
-    }
-    setTimeout(() => {
-      if (!this.isAmbiencePlaying) { // check if it wasn't toggled back on
-        this.ambienceAudio.pause();
-      }
-    }, 2000);
     this.isAmbiencePlaying = false;
     localStorage.setItem('tarot_ambience_on', 'false');
+
+    if (this.fadeInterval) clearInterval(this.fadeInterval);
+    this.fadeInterval = setInterval(() => {
+      if (this.ambienceAudio.volume > 0.02) {
+        this.ambienceAudio.volume = Math.max(0, this.ambienceAudio.volume - 0.05);
+      } else {
+        this.ambienceAudio.volume = 0;
+        this.ambienceAudio.pause();
+        clearInterval(this.fadeInterval);
+      }
+    }, 150);
   }
 
   init() {
@@ -152,12 +146,8 @@ class AudioService {
         latencyHint: 'playback'
       });
     }
-    if (this.audioCtx.state === 'suspended') {
-      this.audioCtx.resume();
-    }
   }
 
-  // Plays the card flip audio file through the AudioContext to prevent interruption
   async playFlipSound() {
     await this.resumeContext();
     if (!this.flipSource && this.audioCtx) {
@@ -165,10 +155,9 @@ class AudioService {
       this.flipSource.connect(this.audioCtx.destination);
     }
     this.flipAudio.currentTime = 0;
-    this.flipAudio.play().catch(e => console.warn("Audio playback failed:", e));
+    this.flipAudio.play().catch(e => console.warn("Flip sound failed:", e));
   }
 
-  // Plays the card shuffle audio file through the AudioContext to prevent interruption
   async playShuffleSound() {
     await this.resumeContext();
     if (!this.shuffleSource && this.audioCtx) {
@@ -176,12 +165,10 @@ class AudioService {
       this.shuffleSource.connect(this.audioCtx.destination);
     }
     this.shuffleAudio.currentTime = 0;
-    this.shuffleAudio.play().catch(e => console.warn("Audio playback failed:", e));
+    this.shuffleAudio.play().catch(e => console.warn("Shuffle sound failed:", e));
   }
 
   toggleAmbience() {
-    this.init();
-    
     if (this.isAmbiencePlaying) {
       this.pauseAmbience();
       return false;
