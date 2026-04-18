@@ -29,14 +29,16 @@ class AudioService {
 
   setupInteractionListeners() {
     const runOnce = async () => {
-      await this.handleFirstInteraction();
+      // Remove immediately and synchronously to prevent Folge-Events (click after touch) from triggering this again
       window.removeEventListener('click', runOnce);
       window.removeEventListener('touchstart', runOnce);
       window.removeEventListener('mousedown', runOnce);
+      
+      await this.handleFirstInteraction();
     };
     
     window.addEventListener('click', runOnce);
-    window.addEventListener('touchstart', runOnce);
+    window.addEventListener('touchstart', runOnce, { passive: true });
     window.addEventListener('mousedown', runOnce);
   }
 
@@ -53,11 +55,17 @@ class AudioService {
   }
 
   async handleFirstInteraction() {
-    if (this.audioCtx && this.audioCtx.state === 'running' && !this.ambienceAudio.paused) return; // already fine
+    if (this.isInitializing) return;
+    if (this.audioCtx && this.audioCtx.state === 'running' && !this.ambienceAudio.paused) return;
     
-    await this.resumeContext();
-    if (this.isAmbiencePlaying) {
-      this.playAmbience();
+    this.isInitializing = true;
+    try {
+      await this.resumeContext();
+      if (this.isAmbiencePlaying) {
+        this.playAmbience();
+      }
+    } finally {
+      this.isInitializing = false;
     }
   }
 
